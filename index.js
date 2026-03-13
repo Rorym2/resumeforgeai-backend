@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+const authRoutes = require('./src/routes/auth');
 const uploadRoutes = require('./src/routes/upload');
 const scrapeRoutes = require('./src/routes/scrape');
 const generateRoutes = require('./src/routes/generate');
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // Routes
+app.use('/auth', authRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/scrape', scrapeRoutes);
 app.use('/generate', generateRoutes);
