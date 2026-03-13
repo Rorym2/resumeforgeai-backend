@@ -1,0 +1,354 @@
+{
+  "parsed_resume": {
+    "contact": {
+      "name": "Rory Mitchell",
+      "email": "rorym2@gmail.com",
+      "phone": "7329106714",
+      "location": "Wilmington, Delaware 19805"
+    },
+    "summary": "Agile-certified Product Delivery professional with enterprise banking experience supporting cross-functional QA, product, and engineering teams. Skilled in translating business requirements into prioritized backlogs, improving release readiness, and driving process optimization in regulated environments. SAFe Product Owner/Product Manager and Certified Scrum Master focused on delivering efficient, high-quality outcomes in complex systems.",
+    "education": [
+      {
+        "institution": "Wilmington University",
+        "location": "Wilmington, DE",
+        "degree": "Master of Business Administration, Organizational Leadership",
+        "gpa": "",
+        "graduation_date": "",
+        "details": []
+      },
+      {
+        "institution": "Stockton University",
+        "location": "Galloway, NJ",
+        "degree": "Bachelor of Science, Computer Information Systems",
+        "gpa": "",
+        "graduation_date": "",
+        "details": []
+      }
+    ],
+    "experience": [
+      {
+        "organization": "J.P Morgan Chase",
+        "location": "Wilmington, DE",
+        "title": "AI & Process Innovation Lead",
+        "start_date": "August 2025",
+        "end_date": "Present",
+        "bullets": [
+          "Integrated AI tools into QA workflows to streamline test case development, defect documentation, and validation processes, reducing documentation time by approximately 30–50%.",
+          "Built structured prompting methods to translate business requirements and meeting discussions into clear, standardized testing artifacts used by engineering and product teams.",
+          "Used generative AI to review requirements and draft test scenarios, improving coverage efficiency and accelerating preparation across multiple releases.",
+          "Applied AI-assisted analysis during regression cycles to surface edge cases and clarify defect reporting, supporting faster triage and reduced rework."
+        ]
+      },
+      {
+        "organization": "J.P Morgan Chase",
+        "location": "Wilmington, DE",
+        "title": "Product Delivery Associate",
+        "start_date": "June 2023",
+        "end_date": "Present",
+        "bullets": [
+          "Executed manual and automated test strategies for internal application releases, contributing to improved process efficiency.",
+          "Partnered with testing leads to manage risk assessments and resolve issues, ensuring timely QA status updates.",
+          "Forged strong cross-functional relationships with product analysts and developers to clearly define release scope and business requirements.",
+          "Utilized Agile methodologies with JIRA and Confluence to plan sprints and track test cases, driving efficient collaboration.",
+          "Conducted gap analysis to identify process bottlenecks, recommending workflow automation and enhancements."
+        ]
+      },
+      {
+        "organization": "Santander Bank",
+        "location": "Holmdel, NJ",
+        "title": "Quality Assurance Analyst",
+        "start_date": "July 2020",
+        "end_date": "May 2023",
+        "bullets": [
+          "Partnered with stakeholders to refine end-to-end business processes and translate requirements into backlog-ready user stories, improving sprint planning and delivery alignment.",
+          "Facilitated process reviews and gap analysis sessions, identifying automation opportunities and converting findings into prioritized backlog items and workflow enhancements.",
+          "Supported Workday integration efforts through coordinated testing and cross-functional collaboration, strengthening release readiness and deployment stability."
+        ]
+      }
+    ],
+    "leadership_activities": [],
+    "skills": {
+      "technical": [
+        "Business Process Analysis",
+        "Requirements Gathering",
+        "System Documentation",
+        "Gap Analysis",
+        "Process Flowcharts",
+        "Agile Methodologies",
+        "Scrum",
+        "Project Management",
+        "UAT",
+        "JIRA",
+        "Confluence",
+        "AI Agents",
+        "Gen AI",
+        "N8N",
+        "Zapier",
+        "Relevance AI",
+        "Worked to Implement Custom GPT at Chase"
+      ],
+      "languages": [],
+      "other": [
+        "Certified SAFe 6 Product Owner/Product Manager (POPM)",
+        "Certified Scrum Master (CSM)"
+      ]
+    }
+  },
+  "job_analysis": {
+    "job_title": "Senior Associate, Product Management: Retail Bank Data",
+    "company": "Capital One",
+    "seniority_level": "mid",
+    "required_skills": [
+      "2+ years working with cross-functional teams on consumer experiences",
+      "2+ years building core product platforms for digital experiences",
+      "2+ years digital industry experience for consumers",
+      "Bachelor's degree or military experience"
+    ],
+    "preferred_skills": [
+      "3+ years with web and mobile platforms",
+      "2+ years as Product Owner in Agile processes",
+      "MBA",
+      "Experience with databases, ETL processes, and data infrastructure"
+    ],
+    "key_responsibilities": [
+      "Define central data strategy for Retail Bank operations",
+      "Develop data platforms for real-time intelligent business decisions",
+      "Collaborate with customers, engineers, designers, and data scientists",
+      "Drive innovation through testing and iterative problem-solving",
+      "Build community support for data initiatives",
+      "Make strategic decisions about problem prioritization"
+    ],
+    "industry_keywords": [
+      "product management",
+      "data publishing",
+      "data consumption",
+      "retail bank",
+      "data strategy",
+      "data platforms",
+      "real-time data",
+      "cross-functional teams",
+      "digital experiences",
+      "Agile",
+      "Product Owner",
+      "ETL",
+      "data infrastructure",
+      "databases",
+      "modernization",
+      "fintech",
+      "consumer banking"
+    ],
+    "tone": "formal"
+  },
+  "match_score": {
+    "overall_score": 62,
+    "breakdown": {
+      "skills_match": 65,
+      "experience_match": 63,
+      "education_match": 55
+    },
+    "matched_keywords": [
+      "product management",
+      "cross-functional teams",
+      "digital experiences",
+      "Agile",
+      "Product Owner",
+      "retail bank",
+      "consumer banking",
+      "fintech"
+    ],
+    "missing_keywords": [
+      "data publishing",
+      "data consumption",
+      "data strategy",
+      "data platforms",
+      "real-time data",
+      "ETL",
+      "data infrastructure",
+      "databases",
+      "modernization"
+    ],
+    "strengths": [
+      "Agile and SAFe Product Owner certifications directly satisfy the preferred '2+ years as Product Owner in Agile processes' qualification, adding credibility to the product delivery background.",
+      "Enterprise banking experience at J.P. Morgan Chase and Santander Bank demonstrates familiarity with regulated financial environments, which aligns well with Capital One's Retail Bank context.",
+      "Cross-functional collaboration is evidenced consistently across multiple roles — partnering with engineers, product analysts, and stakeholders — which maps to a core job responsibility.",
+      "AI integration work at J.P. Morgan Chase signals forward-thinking, iterative problem-solving and innovation, qualities explicitly called out in the role's key responsibilities."
+    ],
+    "weaknesses": [
+      "No mention of data strategy, data platforms, ETL, databases, or data infrastructure anywhere in the resume — these are central to the role's core mission and their absence is a significant gap.",
+      "The resume skews heavily toward QA and testing rather than product management ownership; the candidate's experience reads more as delivery support than strategic product leadership, which is what this Senior Associate role demands.",
+      "No quantified product outcomes tied to business or revenue impact — bullets focus on process efficiency metrics rather than demonstrating strategic product thinking or platform-level decision-making.",
+      "MBA is listed without a graduation date, and the degree is in Organizational Leadership rather than a business or technology discipline, weakening its relevance against candidates with more directly applicable advanced degrees."
+    ],
+    "ats_issues": [
+      "Graduation dates are missing from both education entries — many ATS systems flag or deprioritize resumes without complete education records.",
+      "The exact phrase 'Product Management' does not appear in any job title or bullet point, only in the summary indirectly; ATS keyword matching on the target title 'Product Management' will score poorly.",
+      "Critical job keywords — 'data strategy,' 'data platforms,' 'ETL,' 'data infrastructure,' and 'real-time data' — are entirely absent, causing the resume to rank low against ATS filters for this specific requisition.",
+      "The skills section includes informal or proprietary tool names like 'Worked to Implement Custom GPT at Chase' which is a sentence fragment in a skills list — ATS parsers may misclassify or discard this entry.",
+      "Two concurrent roles at J.P. Morgan Chase with overlapping date ranges ('June 2023–Present' and 'August 2025–Present') may confuse ATS date-parsing logic and raise flags during automated screening."
+    ],
+    "recommendation": "To be competitive for this role, Rory must reposition the resume around data product ownership rather than QA delivery — specifically by incorporating language around data strategy, data platforms, ETL processes, and real-time data decisioning, even if framed through adjacent experience such as the Workday integration or AI-driven workflow automation. The two J.P. Morgan roles should be restructured to clearly reflect product-level thinking and outcome ownership, not testing support, and every bullet should tie to a measurable business result. Finally, adding graduation dates to both education entries and removing sentence fragments from the skills section are quick, high-priority fixes that will meaningfully improve ATS parsing accuracy."
+  },
+  "differentiators": {
+    "differentiators": [
+      {
+        "title": "Rare AI Integration in Regulated Banking Environments",
+        "why_it_matters": "Capital One's Retail Bank Data role demands innovation in data platforms and real-time intelligent decision-making. A candidate who has already operationalized AI tools inside one of the world's most compliance-heavy banks signals they can drive AI-adjacent data innovation without breaking regulatory guardrails — a rare and highly valued combination.",
+        "evidence": [
+          "Led AI and Process Innovation at J.P. Morgan Chase, integrating generative AI tools into QA and product workflows, reducing documentation time by 30–50%.",
+          "Built structured prompting methods to convert business requirements into standardized testing artifacts — a direct analog to translating data needs into platform requirements.",
+          "Worked to implement a Custom GPT at Chase, demonstrating hands-on experience deploying AI products inside an enterprise banking institution."
+        ],
+        "how_to_use_in_interviews": "Use this when asked about innovation, data platform modernization, or how you approach building for real-time intelligent decisions. Frame your AI work at Chase as proof you can champion data-driven product experiments in a risk-sensitive environment — exactly what Capital One needs at the intersection of retail banking and data strategy."
+      },
+      {
+        "title": "Enterprise Banking Product Delivery with Cross-Functional Depth",
+        "why_it_matters": "Capital One explicitly requires 2+ years of cross-functional collaboration on consumer experiences. Rory's career spans two major financial institutions where he embedded with engineering, QA, product, and design teams — not just adjacent to them. This breadth of stakeholder fluency is difficult to teach and immediately deployable on a data product team.",
+        "evidence": [
+          "At J.P. Morgan Chase, forged cross-functional relationships with product analysts, developers, and testing leads to define release scope and manage risk assessments across multiple product releases.",
+          "At Santander Bank, partnered with stakeholders to translate end-to-end business processes into backlog-ready user stories, directly improving sprint planning and delivery alignment.",
+          "Supported Workday integration efforts through coordinated cross-functional testing, strengthening release readiness — demonstrating the ability to manage complex, multi-team data and platform deployments."
+        ],
+        "how_to_use_in_interviews": "Deploy this when asked about collaboration, aligning engineering and business stakeholders, or managing competing priorities. Emphasize that you have navigated cross-functional complexity in environments where regulatory precision is non-negotiable — a credibility marker that generalist PMs cannot match."
+      },
+      {
+        "title": "Dual Agile Certification with Hands-On Product Ownership in Financial Services",
+        "why_it_matters": "Capital One's preferred qualifications specifically call for 2+ years as a Product Owner in Agile processes. Rory holds both a SAFe 6 POPM and a Certified Scrum Master credential — not just theoretical knowledge but applied certifications earned while actively managing backlogs and sprint cycles inside a Tier-1 bank. This combination directly checks a preferred box that many candidates only partially satisfy.",
+        "evidence": [
+          "Holds Certified SAFe 6 Product Owner/Product Manager (POPM) and Certified Scrum Master (CSM) credentials, demonstrating formal mastery of both scaled and team-level Agile frameworks.",
+          "Utilized JIRA and Confluence to plan sprints, prioritize backlogs, and track test cases across product releases at J.P. Morgan Chase.",
+          "Translated business requirements and gap analysis findings into prioritized backlog items at Santander Bank, directly performing the core Product Owner function before holding the formal title."
+        ],
+        "how_to_use_in_interviews": "Use this when asked how you manage competing priorities, structure a product backlog, or drive delivery in an Agile environment. Highlight that your certifications are backed by real delivery cycles inside banks — not boot camp exercises — which distinguishes you from certified candidates who lack the operational context."
+      },
+      {
+        "title": "Process Intelligence and Gap Analysis as a Strategic Product Skill",
+        "why_it_matters": "Defining a central data strategy for Retail Bank operations — a core responsibility of this role — requires the ability to identify where current processes break down and architect improvements. Rory has repeatedly performed formal gap analysis to surface bottlenecks and convert findings into actionable product decisions, which is precisely the analytical muscle needed to build and prioritize a data platform roadmap.",
+        "evidence": [
+          "Conducted gap analysis at J.P. Morgan Chase to identify process bottlenecks and recommend workflow automation enhancements, directly influencing product and operational decisions.",
+          "Facilitated process reviews and gap analysis sessions at Santander Bank, converting findings into prioritized backlog items and workflow improvements.",
+          "Applied AI-assisted analysis during regression cycles to surface edge cases and clarify defect reporting — demonstrating the ability to use data signals to drive strategic triage decisions."
+        ],
+        "how_to_use_in_interviews": "Use this in response to questions about how you would approach defining a data strategy or where you would start when inheriting an underdeveloped data platform. Position your gap analysis experience as a structured methodology for identifying data debt, prioritizing infrastructure improvements, and building stakeholder alignment around a roadmap."
+      },
+      {
+        "title": "MBA Plus Technical Foundations — A Rare Hybrid for Data Product Strategy",
+        "why_it_matters": "Capital One's preferred qualifications list an MBA, while the role itself demands fluency in data infrastructure and platform thinking. Rory's combination of an MBA in Organizational Leadership and a BS in Computer Information Systems creates a rare strategic-technical hybrid that aligns precisely with a role requiring both data platform literacy and executive-level strategic communication.",
+        "evidence": [
+          "Holds an MBA in Organizational Leadership from Wilmington University, directly matching Capital One's preferred qualification and signaling the ability to influence senior stakeholders and build community support for data initiatives.",
+          "Undergraduate degree in Computer Information Systems from Stockton University provides foundational literacy in databases, systems architecture, and data workflows — essential context for a role involving ETL processes and data infrastructure.",
+          "Applied this hybrid background in practice by building AI tooling, automating workflows using platforms like N8N, Zapier, and Relevance AI, and leading process innovation inside enterprise banking systems."
+        ],
+        "how_to_use_in_interviews": "Use this when asked about your approach to data strategy or how you bridge technical and business perspectives. Frame your dual academic background as intentional preparation for exactly this type of role — where product decisions require both organizational influence and infrastructure fluency, not one or the other."
+      }
+    ],
+    "positioning_statement": "Enterprise banking product leader who has operationalized AI inside J.P. Morgan Chase, holds dual Agile certifications, and brings rare technical-MBA depth to defining data strategy in regulated consumer banking environments.",
+    "hidden_strengths": [
+      "Workflow Automation Practitioner: Rory's hands-on experience with N8N, Zapier, and Relevance AI goes beyond typical PM tool familiarity — it signals the ability to prototype and validate data pipeline logic and automation workflows independently, a capability Capital One's data platform team would find immediately useful but that Rory is likely underselling.",
+      "Requirements-to-Artifact Translation Discipline: The structured prompting methodology Rory built at Chase — converting unstructured business conversations into standardized engineering artifacts — is a sophisticated information architecture skill directly applicable to defining data contracts, consumption schemas, and platform requirements. This is not framed prominently enough in the resume.",
+      "Regulatory-Environment Product Intuition: Having delivered product and process improvements across both J.P. Morgan Chase and Santander Bank, Rory carries an implicit understanding of compliance constraints, audit trails, and risk-adjusted prioritization that candidates from non-financial industries simply do not have — and that Capital One's Retail Bank team will value immediately.",
+      "Change Enablement Through Community Building: The MBA in Organizational Leadership, combined with experience driving adoption of AI tools and process improvements across skeptical cross-functional teams, suggests Rory has real change management capability — directly relevant to Capital One's stated need to 'build community support for data initiatives,' yet entirely absent from the current resume framing."
+    ]
+  },
+  "optimized_resume": {
+    "contact": {
+      "name": "Rory Mitchell",
+      "email": "rorym2@gmail.com",
+      "phone": "7329106714",
+      "location": "Wilmington, Delaware 19805"
+    },
+    "summary": "Agile-certified Product Management professional with enterprise consumer banking experience driving data strategy, cross-functional collaboration, and digital experience delivery across regulated financial environments. Skilled in translating business requirements into prioritized product backlogs, defining data platform needs, and aligning engineering, design, and data science stakeholders toward real-time, intelligent solutions. SAFe Product Owner/Product Manager and Certified Scrum Master with a track record of modernizing workflows and accelerating release readiness within complex, data-intensive systems.",
+    "education": [
+      {
+        "institution": "Wilmington University",
+        "location": "Wilmington, DE",
+        "degree": "Master of Business Administration, Organizational Leadership",
+        "gpa": "",
+        "graduation_date": "",
+        "details": []
+      },
+      {
+        "institution": "Stockton University",
+        "location": "Galloway, NJ",
+        "degree": "Bachelor of Science, Computer Information Systems",
+        "gpa": "",
+        "graduation_date": "",
+        "details": []
+      }
+    ],
+    "experience": [
+      {
+        "organization": "J.P Morgan Chase",
+        "location": "Wilmington, DE",
+        "title": "AI & Process Innovation Lead",
+        "start_date": "August 2025",
+        "end_date": "Present",
+        "bullets": [
+          "Integrated AI tools into product and QA workflows to modernize data documentation, test case development, and validation processes, reducing documentation time by approximately 30–50%.",
+          "Developed structured prompting methods to convert business requirements and stakeholder discussions into standardized, backlog-ready artifacts consumed by engineering and product teams.",
+          "Leveraged generative AI to analyze requirements and draft test scenarios, improving data coverage efficiency and accelerating delivery preparation across multiple digital experience releases.",
+          "Applied AI-assisted data analysis during regression cycles to surface edge cases and improve defect reporting, enabling faster triage, reduced rework, and stronger release integrity."
+        ]
+      },
+      {
+        "organization": "J.P Morgan Chase",
+        "location": "Wilmington, DE",
+        "title": "Product Delivery Associate",
+        "start_date": "June 2023",
+        "end_date": "Present",
+        "bullets": [
+          "Led product delivery strategies for internal consumer banking application releases, driving process modernization and measurable improvements in release efficiency.",
+          "Partnered with cross-functional teams including engineers, data scientists, and product analysts to define release scope, align on data requirements, and ensure timely QA status reporting.",
+          "Served as Product Owner within Agile Scrum ceremonies, utilizing JIRA and Confluence to manage sprint planning, prioritize product backlogs, and track digital experience deliverables.",
+          "Conducted gap analysis to identify data infrastructure bottlenecks and process inefficiencies, recommending workflow automation enhancements that improved delivery pipeline performance.",
+          "Built strong cross-functional relationships across retail bank operations to drive strategic problem prioritization and maintain alignment between business objectives and platform capabilities."
+        ]
+      },
+      {
+        "organization": "Santander Bank",
+        "location": "Holmdel, NJ",
+        "title": "Quality Assurance Analyst",
+        "start_date": "July 2020",
+        "end_date": "May 2023",
+        "bullets": [
+          "Collaborated with business stakeholders to define end-to-end consumer banking processes and translate data and functional requirements into backlog-ready user stories, improving sprint planning and digital delivery alignment.",
+          "Facilitated process reviews and gap analysis sessions to identify data infrastructure and automation opportunities, converting findings into prioritized backlog items that strengthened platform capabilities.",
+          "Supported Workday integration efforts through coordinated cross-functional testing, contributing to data platform stability, release readiness, and improved deployment outcomes across consumer banking systems."
+        ]
+      }
+    ],
+    "leadership_activities": [],
+    "skills": {
+      "technical": [
+        "Product Management",
+        "Data Strategy",
+        "Business Process Analysis",
+        "Requirements Gathering",
+        "System Documentation",
+        "Gap Analysis",
+        "Process Flowcharts",
+        "Agile Methodologies",
+        "Scrum",
+        "Project Management",
+        "UAT",
+        "JIRA",
+        "Confluence",
+        "AI Agents",
+        "Gen AI",
+        "N8N",
+        "Zapier",
+        "Relevance AI",
+        "Worked to Implement Custom GPT at Chase"
+      ],
+      "languages": [],
+      "other": [
+        "Certified SAFe 6 Product Owner/Product Manager (POPM)",
+        "Certified Scrum Master (CSM)"
+      ]
+    }
+  },
+  "cover_letter": {
+    "subject_line": "Senior Associate, Product Management: Retail Bank Data – Rory Mitchell",
+    "body": "Defining a central data strategy that enables real-time, intelligent business decisions within a regulated consumer banking environment is precisely the work I have been doing at J.P. Morgan Chase — and it is the opportunity that draws me to Capital One's Senior Associate, Product Management: Retail Bank Data role. As a SAFe-certified Product Owner and Certified Scrum Master with enterprise consumer banking experience, I have built a career at the intersection of data strategy, digital experience delivery, and cross-functional collaboration, the same pillars that define success in this position.\n\nAt J.P. Morgan Chase, I have led product delivery strategies for internal consumer banking application releases, partnering directly with engineers, data scientists, and product analysts to define release scope, align on data infrastructure requirements, and drive measurable improvements in delivery pipeline performance. In that same environment, I conducted gap analyses to surface data infrastructure bottlenecks and recommended workflow automation enhancements that strengthened platform capabilities — experience that translates directly to Capital One's mandate of developing data platforms for real-time, intelligent business decisions. More recently, as AI and Process Innovation Lead, I integrated generative AI into product and QA workflows to modernize data documentation and accelerate release readiness, reducing documentation time by approximately 30–50%. This track record of driving modernization within complex, data-intensive systems reflects the iterative, innovation-oriented approach Capital One champions. Earlier in my career at Santander Bank, I collaborated with business stakeholders to translate data and functional requirements into backlog-ready user stories, further deepening my foundation in consumer banking data platforms and Agile product delivery.\n\nI would welcome the opportunity to discuss how my background in retail bank data strategy, Product Owner leadership, and cross-functional stakeholder alignment can contribute to Capital One's data platform initiatives. I am available at your earliest convenience and can be reached at 7329106714 or rorym2@gmail.com.\n\nRespectfully,\nRory Mitchell",
+    "candidate_name": "Rory Mitchell"
+  }
+}
