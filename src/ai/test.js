@@ -5,6 +5,8 @@ const path = require('path');
 
 const { parseResume } = require('./resumeParser');
 const { analyzeJob } = require('./jobAnalyzer');
+const { scoreMatch } = require('./matchScorer');
+const { analyzeDifferentiators } = require('./differentiatorAnalyzer');
 const { optimizeResume } = require('./resumeOptimizer');
 const { generateCoverLetter } = require('./coverLetterGenerator');
 
@@ -109,13 +111,41 @@ async function runPipeline() {
     console.log(JSON.stringify(jobAnalysis, null, 2));
 
     console.log('\n----------------------------------------------------');
-    console.log('Step 3/4 — Optimizing resume for the job...');
+    console.log('Step 3/5 — Scoring resume match (before optimization)...');
+    const matchScore = await scoreMatch(parsedResume, jobAnalysis);
+    console.log('\n✓ Match Score:');
+    console.log(`  Overall: ${matchScore.overall_score}/100`);
+    console.log(`  Skills: ${matchScore.breakdown.skills_match}/100`);
+    console.log(`  Experience: ${matchScore.breakdown.experience_match}/100`);
+    console.log(`  Education: ${matchScore.breakdown.education_match}/100`);
+    console.log(`  Matched keywords: ${matchScore.matched_keywords.join(', ')}`);
+    console.log(`  Missing keywords: ${matchScore.missing_keywords.join(', ')}`);
+    console.log(`  Strengths:\n    • ${matchScore.strengths.join('\n    • ')}`);
+    console.log(`  Weaknesses:\n    • ${matchScore.weaknesses.join('\n    • ')}`);
+    console.log(`  ATS Issues:\n    • ${matchScore.ats_issues.join('\n    • ')}`);
+    console.log(`  Recommendation: ${matchScore.recommendation}`);
+
+    console.log('\n----------------------------------------------------');
+    console.log('Step 4/6 — Analyzing differentiators...');
+    const differentiators = await analyzeDifferentiators(parsedResume, jobAnalysis);
+    console.log('\n✓ Differentiators:');
+    differentiators.differentiators.forEach((d, i) => {
+      console.log(`\n  ${i + 1}. ${d.title}`);
+      console.log(`     Why it matters: ${d.why_it_matters}`);
+      console.log(`     Evidence: ${d.evidence.join(' | ')}`);
+      console.log(`     Use in interviews: ${d.how_to_use_in_interviews}`);
+    });
+    console.log(`\n  Positioning statement: "${differentiators.positioning_statement}"`);
+    console.log(`\n  Hidden strengths:\n    • ${differentiators.hidden_strengths.join('\n    • ')}`);
+
+    console.log('\n----------------------------------------------------');
+    console.log('Step 5/6 — Optimizing resume for the job...');
     const optimizedResume = await optimizeResume(parsedResume, jobAnalysis);
     console.log('\n✓ Optimized Resume JSON:');
     console.log(JSON.stringify(optimizedResume, null, 2));
 
     console.log('\n----------------------------------------------------');
-    console.log('Step 4/4 — Generating cover letter...');
+    console.log('Step 6/6 — Generating cover letter...');
     const coverLetter = await generateCoverLetter(optimizedResume, jobAnalysis);
     console.log('\n✓ Cover Letter:');
     console.log(`Subject: ${coverLetter.subject_line}\n`);
@@ -125,6 +155,8 @@ async function runPipeline() {
     const output = {
       parsed_resume: parsedResume,
       job_analysis: jobAnalysis,
+      match_score: matchScore,
+      differentiators,
       optimized_resume: optimizedResume,
       cover_letter: coverLetter,
     };
@@ -143,6 +175,46 @@ async function runPipeline() {
     ].filter(Boolean).join('\n');
 
     const readable = `
+=====================================
+  MATCH SCORE (before optimization)
+  Target: ${jobAnalysis.job_title} @ ${jobAnalysis.company}
+=====================================
+
+Overall: ${matchScore.overall_score}/100
+  Skills match:     ${matchScore.breakdown.skills_match}/100
+  Experience match: ${matchScore.breakdown.experience_match}/100
+  Education match:  ${matchScore.breakdown.education_match}/100
+
+Matched keywords: ${matchScore.matched_keywords.join(', ')}
+Missing keywords: ${matchScore.missing_keywords.join(', ')}
+
+Strengths:
+${matchScore.strengths.map(s => `  • ${s}`).join('\n')}
+
+Weaknesses:
+${matchScore.weaknesses.map(w => `  • ${w}`).join('\n')}
+
+ATS Issues:
+${matchScore.ats_issues.map(i => `  • ${i}`).join('\n')}
+
+Recommendation: ${matchScore.recommendation}
+
+=====================================
+  YOUR DIFFERENTIATORS
+  What makes you stand out for this role
+=====================================
+
+Positioning Statement:
+"${differentiators.positioning_statement}"
+
+${differentiators.differentiators.map((d, i) => `${i + 1}. ${d.title}
+   Why it matters: ${d.why_it_matters}
+   Evidence: ${d.evidence.join(' | ')}
+   Use in interviews: ${d.how_to_use_in_interviews}`).join('\n\n')}
+
+Hidden Strengths:
+${differentiators.hidden_strengths.map(s => `  • ${s}`).join('\n')}
+
 =====================================
   OPTIMIZED RESUME
   Target: ${jobAnalysis.job_title} @ ${jobAnalysis.company}
