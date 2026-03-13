@@ -4,6 +4,7 @@ const mammoth = require('mammoth');
 const PDFParser = require('pdf2json');
 const path = require('path');
 const fs = require('fs');
+const supabase = require('../lib/supabase');
 
 const router = express.Router();
 
@@ -72,10 +73,27 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
       return res.status(422).json({ error: 'Could not extract text from the file. Make sure it is not a scanned image PDF.' });
     }
 
+    // Save the resume text to Supabase linked to the logged-in user
+    const { data: resume, error } = await supabase
+      .from('resumes')
+      .insert({
+        user_id: req.user.id,
+        filename: req.file.originalname,
+        text_content: text.trim(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return res.status(500).json({ error: 'Failed to save resume.', detail: error.message });
+    }
+
     return res.json({
       success: true,
-      filename: req.file.originalname,
-      text: text.trim(),
+      resume_id: resume.id,
+      filename: resume.filename,
+      text: resume.text_content,
     });
   } catch (err) {
     // Clean up temp file on error

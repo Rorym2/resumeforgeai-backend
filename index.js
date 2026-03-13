@@ -2,11 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-const authRoutes = require('./src/routes/auth');
 const uploadRoutes = require('./src/routes/upload');
 const scrapeRoutes = require('./src/routes/scrape');
 const generateRoutes = require('./src/routes/generate');
 const documentRoutes = require('./src/routes/documents');
+const { requireAuth } = require('./src/middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,12 +17,11 @@ app.use(cors());
 // Parse JSON request bodies
 app.use(express.json({ limit: '10mb' }));
 
-// Routes
-app.use('/auth', authRoutes);
-app.use('/upload', uploadRoutes);
-app.use('/scrape', scrapeRoutes);
-app.use('/generate', generateRoutes);
-app.use('/documents', documentRoutes);
+// Routes (all protected by JWT auth except health check)
+app.use('/upload', requireAuth, uploadRoutes);
+app.use('/scrape', requireAuth, scrapeRoutes);
+app.use('/generate', requireAuth, generateRoutes);
+app.use('/documents', requireAuth, documentRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
