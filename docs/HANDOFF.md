@@ -1,5 +1,5 @@
 # ResumeForge AI — Backend Handoff Notes
-_Last updated: 2026-03-13_
+_Last updated: 2026-03-14_
 
 ## Overview
 
@@ -185,20 +185,18 @@ Each module calls the Claude API independently. The pipeline runs sequentially i
 | `phase/1-ai-engine` | complete | All 6 AI modules |
 | `phase/2-backend-api` | complete | All 4 API routes (stub auth) |
 | `phase/3-database-auth` | complete | Supabase integration, JWT middleware, DB schema |
+| `phase/6-payments` | complete | npm scripts update; no backend code changes (paywall is client-side) |
 
-Current active branch: `phase/3-database-auth`
+Current active branch: `phase/6-payments`
 
 ---
 
-## What's Left (Phases 4–10)
+## What's Left (Phases 7–10)
 
-- **Phase 4** (in progress on client): Mobile screens — upload, job input, processing, results
-- **Phase 5**: Mobile auth — Supabase login/signup screens in the app
-- **Phase 6**: Subscriptions — RevenueCat integration, paywall screen, free tier enforcement
 - **Phase 7**: Job URL scraping — parse job listings from URLs
-- **Phase 8**: Document history — saved results screen, re-view past generations
-- **Phase 9**: Polish — onboarding, empty states, error handling, analytics
-- **Phase 10**: Launch prep — App Store / Play Store submission, deployment to Railway/Render
+- **Phase 8**: Polish & QA
+- **Phase 9**: EAS Build + App Store / Play Store submission + deployment to Railway/Render
+- **Phase 10**: Go public
 
 ---
 
@@ -209,3 +207,10 @@ Current active branch: `phase/3-database-auth`
 3. **AI prompt tuning** — the prompts in `src/ai/` are first-pass. They work but will benefit from iteration once real user resumes are tested.
 4. **No rate limiting or abuse protection** yet on the API — should be added before public launch.
 5. **No deployment pipeline** — manual deploy to Railway/Render planned for Phase 10.
+
+---
+
+## What Changed in Phase 6
+
+- `package.json` now has `scripts.start = "node index.js"` and `scripts.dev = "node --watch index.js"`. Run `npm start` to start the server — no more bare `node index.js`.
+- The `/generate` endpoint already returns HTTP 402 when the free tier is exceeded. The mobile app now catches this status specifically (via `err.code === 'FREE_TIER_LIMIT'` in `src/lib/api.js`) and navigates the user to the Paywall screen instead of showing a generic error.
