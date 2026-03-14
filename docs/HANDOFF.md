@@ -186,6 +186,7 @@ Each module calls the Claude API independently. The pipeline runs sequentially i
 | `phase/2-backend-api` | complete | All 4 API routes (stub auth) |
 | `phase/3-database-auth` | complete | Supabase integration, JWT middleware, DB schema |
 | `phase/6-payments` | complete | npm scripts update; no backend code changes (paywall is client-side) |
+| `phase/7-job-scraping` | complete | cheerio scraper for Indeed/ZipRecruiter/LinkedIn, new /scrape/job-url endpoint |
 
 Current active branch: `phase/6-payments`
 
@@ -207,6 +208,23 @@ Current active branch: `phase/6-payments`
 3. **AI prompt tuning** — the prompts in `src/ai/` are first-pass. They work but will benefit from iteration once real user resumes are tested.
 4. **No rate limiting or abuse protection** yet on the API — should be added before public launch.
 5. **No deployment pipeline** — manual deploy to Railway/Render planned for Phase 10.
+
+---
+
+## What Changed in Phase 7
+
+**New: `src/services/jobScraper.js`**
+Scrapes job descriptions from URLs using `cheerio` (HTML parser). Site-specific logic for Indeed, ZipRecruiter, and LinkedIn. Generic fallback for any other URL.
+
+- Uses browser-like `User-Agent` headers
+- LinkedIn: throws `LINKEDIN_LOGIN_REQUIRED` if description unavailable without login (client handles this with WebView)
+- All text is whitespace-normalized before return
+
+**Updated: `src/routes/scrape.js`**
+- `POST /scrape/job` — unchanged (text paste fallback)
+- `POST /scrape/job-url` — new endpoint, accepts `{ url }`, returns `{ text, source }` or error codes
+
+**New dependency:** `cheerio@^1.2.0`
 
 ---
 
