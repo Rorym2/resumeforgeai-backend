@@ -59,6 +59,7 @@ Return ONLY valid JSON with this exact structure — no explanation, no markdown
 
 Rules:
 - If a field is not present in the resume, use an empty string "" or empty array []
+- Never use the strings "undefined", "null", or "N/A" — use "" for any missing or unknown field
 - Do not invent or infer any information not explicitly in the resume
 - Preserve the exact wording of bullet points
 
