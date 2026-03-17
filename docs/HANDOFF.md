@@ -1,5 +1,5 @@
 # ResumeForge AI — Backend Handoff Notes
-_Last updated: 2026-03-14_
+_Last updated: 2026-03-17_
 
 ## Overview
 
@@ -15,7 +15,7 @@ ResumeForge AI is a mobile-first ATS resume optimization app. Users upload a res
 | AI | Anthropic Claude API (`claude-sonnet-4-6`) |
 | Database / Auth | Supabase (Postgres + Auth) |
 | File parsing | `pdf-parse`, `mammoth` (DOCX) |
-| Deployment target | Railway or Render (not yet deployed) |
+| Deployment | Railway — **live at `https://resumeforgeai-backend-production.up.railway.app`** |
 
 ---
 
@@ -187,27 +187,35 @@ Each module calls the Claude API independently. The pipeline runs sequentially i
 | `phase/3-database-auth` | complete | Supabase integration, JWT middleware, DB schema |
 | `phase/6-payments` | complete | npm scripts update; no backend code changes (paywall is client-side) |
 | `phase/7-job-scraping` | complete | cheerio scraper for Indeed/ZipRecruiter/LinkedIn, new /scrape/job-url endpoint |
+| `phase/8-polish` | complete | Rate limiting, undefined date fix in parser prompt |
 
-Current active branch: `phase/6-payments`
+Current active branch: `phase/8-polish`
 
 ---
 
-## What's Left (Phases 7–10)
+## Deployment
 
-- **Phase 7**: Job URL scraping — parse job listings from URLs
-- **Phase 8**: Polish & QA
-- **Phase 9**: EAS Build + App Store / Play Store submission + deployment to Railway/Render
+**Live URL:** `https://resumeforgeai-backend-production.up.railway.app`
+**Platform:** Railway (project: `resumeforgeai-backend`, service: `resumeforgeai-backend`)
+**Health check:** `GET /health` → `{ status: 'ok', app: 'ResumeForge AI Backend', version: '0.2.0' }`
+
+Environment variables are set directly in Railway (not via `.env` on the server). To update them: `railway variables set KEY=value` from the backend directory (must have service linked via `railway service`).
+
+---
+
+## What's Left (Phases 9–10)
+
+- **Phase 9**: EAS Build + swap in real RevenueCat SDK + App Store / Play Store submission
 - **Phase 10**: Go public
 
 ---
 
 ## Known Issues / Notes for Advisor
 
-1. **Free tier enforcement** is implemented in `generate.js` but not tested end-to-end with a real user yet (client auth not wired in yet).
-2. **File size limit** is set to 10MB in `upload.js` via `multer`. Adjust if needed.
-3. **AI prompt tuning** — the prompts in `src/ai/` are first-pass. They work but will benefit from iteration once real user resumes are tested.
-4. **No rate limiting or abuse protection** yet on the API — should be added before public launch.
-5. **No deployment pipeline** — manual deploy to Railway/Render planned for Phase 10.
+1. **Free tier enforcement** is implemented in `generate.js` but not tested end-to-end with a real authenticated user yet.
+2. **File size limit** is set to 10MB in `upload.js` via `multer`. Adjust if needed based on user feedback.
+3. **AI prompt tuning** — prompts in `src/ai/` are first-pass and will benefit from iteration on real user resumes.
+4. **Job scraper CSS selectors may break** if Indeed/ZipRecruiter update their page structure — monitor after launch.
 
 ---
 
@@ -225,6 +233,20 @@ Scrapes job descriptions from URLs using `cheerio` (HTML parser). Site-specific 
 - `POST /scrape/job-url` — new endpoint, accepts `{ url }`, returns `{ text, source }` or error codes
 
 **New dependency:** `cheerio@^1.2.0`
+
+---
+
+## What Changed in Phase 8
+
+**Updated: `src/ai/resumeParser.js`**
+- Added prompt rule: never return the strings `"undefined"`, `"null"`, or `"N/A"` — use `""` for any missing field. Fixes date fields showing as "undefined" in the Results screen when PDFs have unparseable date formats.
+
+**Updated: `index.js`**
+- Added `express-rate-limit` with two limiters:
+  - General: 100 requests / 15 min / IP on all routes
+  - Strict: 20 requests / 15 min / IP on `/generate` specifically (protects Claude API costs)
+
+**New dependency:** `express-rate-limit@^8.3.1`
 
 ---
 
