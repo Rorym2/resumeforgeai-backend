@@ -1,5 +1,5 @@
 # ResumeForge AI — Backend Handoff Notes
-_Last updated: 2026-03-17_
+_Last updated: 2026-03-21_
 
 ## Overview
 
@@ -205,8 +205,22 @@ Environment variables are set directly in Railway (not via `.env` on the server)
 
 ## What's Left (Phases 9–10)
 
-- **Phase 9**: EAS Build + swap in real RevenueCat SDK + App Store / Play Store submission
+- **Phase 9**: No backend code changes needed. Remaining work is all client-side (EAS builds, store submissions) and account setup (Apple Developer, Google Play Console, RevenueCat dashboard).
 - **Phase 10**: Go public
+
+## Git Branches (updated)
+
+| Branch | Status | What's in it |
+|---|---|---|
+| `main` | stable | initial empty commit |
+| `phase/0-environment-setup` | complete | Express scaffold, env setup |
+| `phase/1-ai-engine` | complete | All 6 AI modules |
+| `phase/2-backend-api` | complete | All 4 API routes (stub auth) |
+| `phase/3-database-auth` | complete | Supabase integration, JWT middleware, DB schema |
+| `phase/6-payments` | complete | npm scripts update |
+| `phase/7-job-scraping` | complete | cheerio scraper for Indeed/ZipRecruiter/LinkedIn |
+| `phase/8-polish` | complete | Rate limiting, undefined date fix in parser prompt |
+| `phase/9-beta-launch` | in progress | No backend changes — branch open for any fixes during beta |
 
 ---
 
