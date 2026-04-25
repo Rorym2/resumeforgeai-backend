@@ -203,10 +203,34 @@ Environment variables are set directly in Railway (not via `.env` on the server)
 
 ---
 
-## What's Left (Phases 9–10)
+## Phase 10 — App Store Submission (In Progress)
+_Last session: 2026-04-25_
 
-- **Phase 9**: No backend code changes needed. Remaining work is all client-side (EAS builds, store submissions) and account setup (Apple Developer, Google Play Console, RevenueCat dashboard).
-- **Phase 10**: Go public
+### What's Done
+
+**Bug fix: `src/routes/generate.js`** (branch: `phase/10-app-store`)
+- Changed free tier limit response from HTTP `403` → `402` to match what the client expects. Previously, free users who exhausted their 3 generations saw a generic error instead of the upgrade/paywall prompt.
+
+**Infrastructure**
+- Railway backend: confirmed live at `https://resumeforgeai-backend-production.up.railway.app/health` — all 4 env vars set in Railway dashboard.
+- Supabase: project was paused (free tier auto-pause) — restored. Now active.
+
+### What's Remaining (Backend — none)
+No further backend code changes needed for Phase 10. All remaining work is infrastructure and store submissions.
+
+### External Status
+| Item | Status |
+|---|---|
+| Railway deployment | Live ✅ |
+| Supabase | Active ✅ |
+| Apple Developer Program | Not enrolled — $99/yr at developer.apple.com |
+| Google Play Console | Account set up ✅ — onboarding in progress |
+| RevenueCat Android app | Started — need service account credentials JSON from Google Play Console |
+| RevenueCat iOS app | Not started — blocked on Apple enrollment |
+| EAS Android build | Not started |
+| EAS iOS build | Not started — blocked on Apple enrollment |
+
+---
 
 ## Git Branches (updated)
 
@@ -220,7 +244,8 @@ Environment variables are set directly in Railway (not via `.env` on the server)
 | `phase/6-payments` | complete | npm scripts update |
 | `phase/7-job-scraping` | complete | cheerio scraper for Indeed/ZipRecruiter/LinkedIn |
 | `phase/8-polish` | complete | Rate limiting, undefined date fix in parser prompt |
-| `phase/9-beta-launch` | in progress | No backend changes — branch open for any fixes during beta |
+| `phase/9-beta-launch` | complete | No backend changes |
+| `phase/10-app-store` | in progress | 402 fix for free tier limit |
 
 ---
 
