@@ -69,7 +69,7 @@ router.post('/', async (req, res) => {
   // Check free tier limit (Phase 6 will add a bypass for paid users)
   const usageCount = await getUsageCount(userId);
   if (usageCount >= FREE_TIER_LIMIT) {
-    return res.status(403).json({
+    return res.status(402).json({
       error: 'Free tier limit reached.',
       message: `You have used all ${FREE_TIER_LIMIT} free generations for this month. Upgrade to Pro for unlimited generations.`,
       usage: { used: usageCount, limit: FREE_TIER_LIMIT },
