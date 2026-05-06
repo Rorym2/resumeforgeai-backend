@@ -8,9 +8,13 @@ const supabase = require('../lib/supabase');
 
 const router = express.Router();
 
+// Ensure the temp uploads directory exists (it's gitignored, so won't exist on Railway)
+const UPLOAD_DIR = path.join(__dirname, '../../uploads');
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
 // Store uploaded files temporarily in the /uploads folder
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../../uploads')),
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
 
