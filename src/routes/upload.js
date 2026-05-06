@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const mammoth = require('mammoth');
-const PDFParser = require('pdf2json');
+const pdfParse = require('pdf-parse');
 const path = require('path');
 const supabase = require('../lib/supabase');
 
@@ -25,22 +25,10 @@ async function extractDocx(buffer) {
   return result.value;
 }
 
-// Extract text from a PDF buffer
-function extractPdf(buffer) {
-  return new Promise((resolve, reject) => {
-    const pdfParser = new PDFParser();
-    pdfParser.on('pdfParser_dataError', err => reject(err.parserError));
-    pdfParser.on('pdfParser_dataReady', pdfData => {
-      const text = pdfData.Pages.map(page =>
-        page.Texts.map(t => {
-          try { return decodeURIComponent(t.R.map(r => r.T).join('')); }
-          catch { return t.R.map(r => r.T).join(''); }
-        }).join(' ')
-      ).join('\n');
-      resolve(text);
-    });
-    pdfParser.parseBuffer(buffer);
-  });
+// Extract text from a PDF buffer — pdf-parse works entirely in memory, no temp files
+async function extractPdf(buffer) {
+  const data = await pdfParse(buffer);
+  return data.text;
 }
 
 // POST /upload/resume
