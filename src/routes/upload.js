@@ -3,23 +3,13 @@ const multer = require('multer');
 const mammoth = require('mammoth');
 const PDFParser = require('pdf2json');
 const path = require('path');
-const fs = require('fs');
 const supabase = require('../lib/supabase');
 
 const router = express.Router();
 
-// Ensure the temp uploads directory exists (it's gitignored, so won't exist on Railway)
-const UPLOAD_DIR = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-// Store uploaded files temporarily in the /uploads folder
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
-
+// Use memory storage — no filesystem dependency, works on ephemeral hosts like Railway
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
   fileFilter: (req, file, cb) => {
     const allowed = ['.pdf', '.docx'];
@@ -29,14 +19,14 @@ const upload = multer({
   },
 });
 
-// Extract text from a DOCX file
-async function extractDocx(filePath) {
-  const result = await mammoth.extractRawText({ path: filePath });
+// Extract text from a DOCX buffer
+async function extractDocx(buffer) {
+  const result = await mammoth.extractRawText({ buffer });
   return result.value;
 }
 
-// Extract text from a PDF file
-function extractPdf(filePath) {
+// Extract text from a PDF buffer
+function extractPdf(buffer) {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser();
     pdfParser.on('pdfParser_dataError', err => reject(err.parserError));
@@ -49,7 +39,7 @@ function extractPdf(filePath) {
       ).join('\n');
       resolve(text);
     });
-    pdfParser.loadPDF(filePath);
+    pdfParser.parseBuffer(buffer);
   });
 }
 
@@ -59,19 +49,16 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
     return res.status(400).json({ error: 'No file uploaded. Send a PDF or DOCX as form-data with key "resume".' });
   }
 
-  const filePath = req.file.path;
+  const buffer = req.file.buffer;
   const ext = path.extname(req.file.originalname).toLowerCase();
 
   try {
     let text;
     if (ext === '.docx') {
-      text = await extractDocx(filePath);
+      text = await extractDocx(buffer);
     } else if (ext === '.pdf') {
-      text = await extractPdf(filePath);
+      text = await extractPdf(buffer);
     }
-
-    // Clean up the temp file after extraction
-    fs.unlinkSync(filePath);
 
     if (!text || text.trim().length === 0) {
       return res.status(422).json({ error: 'Could not extract text from the file. Make sure it is not a scanned image PDF.' });
@@ -100,8 +87,6 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
       text: resume.text_content,
     });
   } catch (err) {
-    // Clean up temp file on error
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     console.error('Upload error:', err);
     return res.status(500).json({ error: 'Failed to process file.', detail: err.message });
   }
