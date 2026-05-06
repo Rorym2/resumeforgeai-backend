@@ -1,7 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 const mammoth = require('mammoth');
-const pdfParse = require('pdf-parse');
 const path = require('path');
 const supabase = require('../lib/supabase');
 
@@ -25,8 +24,15 @@ async function extractDocx(buffer) {
   return result.value;
 }
 
-// Extract text from a PDF buffer — pdf-parse works entirely in memory, no temp files
+// Extract text from a PDF buffer using pdfjs-dist directly.
+// We import pdf-parse via its internal lib path to skip the test-runner
+// that the main entry point runs on require(), which writes temp files to disk.
 async function extractPdf(buffer) {
+  if (!Buffer.isBuffer(buffer)) {
+    throw new Error(`Expected a Buffer for PDF parsing but got: ${typeof buffer}`);
+  }
+  // Use the library path directly — avoids the test runner in pdf-parse's index.js
+  const pdfParse = require('pdf-parse/lib/pdf-parse.js');
   const data = await pdfParse(buffer);
   return data.text;
 }
@@ -40,12 +46,16 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
   const buffer = req.file.buffer;
   const ext = path.extname(req.file.originalname).toLowerCase();
 
+  console.log(`[upload] Received file: ${req.file.originalname}, size: ${req.file.size}, hasBuffer: ${Buffer.isBuffer(buffer)}`);
+
   try {
     let text;
     if (ext === '.docx') {
       text = await extractDocx(buffer);
     } else if (ext === '.pdf') {
       text = await extractPdf(buffer);
+    } else {
+      return res.status(400).json({ error: 'Unsupported file type.' });
     }
 
     if (!text || text.trim().length === 0) {
@@ -75,7 +85,7 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
       text: resume.text_content,
     });
   } catch (err) {
-    console.error('Upload error:', err);
+    console.error('[upload] Error processing file:', err.message);
     return res.status(500).json({ error: 'Failed to process file.', detail: err.message });
   }
 });

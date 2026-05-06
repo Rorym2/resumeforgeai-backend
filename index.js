@@ -12,9 +12,9 @@ const { requireAuth } = require('./src/middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Trust Railway's proxy so express-rate-limit sees the real client IP
-// (without this, every request looks like it comes from the same proxy IP)
-app.set('trust proxy', 1);
+// Trust Railway's reverse proxy so req.ip is the real client IP,
+// not the proxy's IP. Required for express-rate-limit to work correctly.
+app.set('trust proxy', true);
 
 // Allow the mobile app (and Postman) to connect
 app.use(cors());
@@ -29,6 +29,7 @@ const generalLimiter = rateLimit({
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },
+  validate: { xForwardedForHeader: false }, // we've set trust proxy above
 });
 
 // Strict limit on /generate — protects Claude API costs (20 per 15 min per IP)
@@ -38,6 +39,7 @@ const generateLimiter = rateLimit({
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many generation requests, please try again later.' },
+  validate: { xForwardedForHeader: false }, // we've set trust proxy above
 });
 
 app.use(generalLimiter);
