@@ -12,6 +12,10 @@ const { requireAuth } = require('./src/middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust Railway's proxy so express-rate-limit sees the real client IP
+// (without this, every request looks like it comes from the same proxy IP)
+app.set('trust proxy', 1);
+
 // Allow the mobile app (and Postman) to connect
 app.use(cors());
 
