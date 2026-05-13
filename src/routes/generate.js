@@ -10,6 +10,7 @@ const supabase = require('../lib/supabase');
 const router = express.Router();
 
 const FREE_TIER_LIMIT = 3; // generations per month
+const MAX_INPUT_LENGTH = 100 * 1024; // 100KB
 
 // Get the current month as a string e.g. '2026-03'
 function currentMonth() {
@@ -80,31 +81,32 @@ async function checkAndIncrementUsage(userId, limit) {
   return { allowed: row.allowed, used: row.used };
 }
 
-// Fallback for if the RPC isn't set up yet — has a small race window but fine for low traffic
+// Fallback for if the RPC isn't set up yet. This has a race window where another request
+// could increment between the SELECT and UPDATE, but for low-traffic fallback scenarios it's acceptable.
+// The RPC-based approach is preferred since it's atomic.
 async function fallbackCheckAndIncrement(userId, limit) {
-  const { data } = await supabase
-    .from('usage_tracking')
-    .select('generation_count')
-    .eq('user_id', userId)
-    .eq('month', currentMonth())
-    .single();
-
-  const current = data?.generation_count ?? 0;
-  if (current >= limit) return { allowed: false, used: current };
-
-  const { data: existing } = await supabase
+  const { data, error: selectError } = await supabase
     .from('usage_tracking')
     .select('id, generation_count')
     .eq('user_id', userId)
     .eq('month', currentMonth())
-    .single();
+    .maybeSingle();
+
+  if (selectError && selectError.code !== 'PGRST116') {
+    throw selectError;
+  }
+
+  const existing = data;
+  const current = existing?.generation_count ?? 0;
+
+  if (current >= limit) return { allowed: false, used: current };
 
   if (existing) {
     await supabase
       .from('usage_tracking')
-      .update({ generation_count: existing.generation_count + 1, updated_at: new Date() })
+      .update({ generation_count: current + 1, updated_at: new Date() })
       .eq('id', existing.id);
-    return { allowed: true, used: existing.generation_count + 1 };
+    return { allowed: true, used: current + 1 };
   } else {
     await supabase
       .from('usage_tracking')
@@ -123,26 +125,35 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'resume_text is required and must be the full resume content.' });
   }
 
+  if (resume_text.length > MAX_INPUT_LENGTH) {
+    return res.status(400).json({ error: `resume_text exceeds maximum length of ${MAX_INPUT_LENGTH / 1024}KB.` });
+  }
+
   if (!job_text || job_text.trim().length < 50) {
     return res.status(400).json({ error: 'job_text is required and must be the full job description.' });
+  }
+
+  if (job_text.length > MAX_INPUT_LENGTH) {
+    return res.status(400).json({ error: `job_text exceeds maximum length of ${MAX_INPUT_LENGTH / 1024}KB.` });
   }
 
   // Pro users bypass the free tier limit entirely
   const pro = await isUserPro(userId);
 
+  let usageResult = null;
   if (!pro) {
-    // Atomically check + increment usage — prevents race conditions
-    const { allowed, used } = await checkAndIncrementUsage(userId, FREE_TIER_LIMIT);
+    // Check usage before running expensive pipeline
+    usageResult = await checkAndIncrementUsage(userId, FREE_TIER_LIMIT);
 
-    if (!allowed) {
+    if (!usageResult.allowed) {
       return res.status(402).json({
         error: 'Free tier limit reached.',
         message: `You have used all ${FREE_TIER_LIMIT} free generations for this month. Upgrade to Pro for unlimited generations.`,
-        usage: { used, limit: FREE_TIER_LIMIT },
+        usage: { used: usageResult.used, limit: FREE_TIER_LIMIT },
       });
     }
 
-    console.log(`[generate] Starting pipeline for user ${userId} (${used}/${FREE_TIER_LIMIT} this month)`);
+    console.log(`[generate] Starting pipeline for user ${userId} (${usageResult.used}/${FREE_TIER_LIMIT} this month)`);
   } else {
     console.log(`[generate] Starting pipeline for Pro user ${userId}`);
   }
@@ -150,27 +161,23 @@ router.post('/', async (req, res) => {
   const startTime = Date.now();
 
   try {
-    // Step 1: Parse the resume into structured JSON
-    console.log('[generate] Step 1/6 — Parsing resume...');
-    const parsedResume = await parseResume(resume_text);
+    // Steps 1 & 2 can run in parallel — they don't depend on each other
+    console.log('[generate] Steps 1-2/6 — Parsing resume and analyzing job...');
+    const [parsedResume, jobAnalysis] = await Promise.all([
+      parseResume(resume_text),
+      analyzeJob(job_text),
+    ]);
 
-    // Step 2: Analyze the job listing
-    console.log('[generate] Step 2/6 — Analyzing job...');
-    const jobAnalysis = await analyzeJob(job_text);
-
-    // Step 3: Score how well the original resume matches the job
+    // Steps 3-6 depend on results from 1-2
     console.log('[generate] Step 3/6 — Scoring match...');
     const matchScore = await scoreMatch(parsedResume, jobAnalysis);
 
-    // Step 4: Find candidate differentiators
     console.log('[generate] Step 4/6 — Analyzing differentiators...');
     const differentiators = await analyzeDifferentiators(parsedResume, jobAnalysis);
 
-    // Step 5: Rewrite the resume optimized for this job
     console.log('[generate] Step 5/6 — Optimizing resume...');
     const optimizedResume = await optimizeResume(parsedResume, jobAnalysis);
 
-    // Step 6: Generate the cover letter
     console.log('[generate] Step 6/6 — Generating cover letter...');
     const coverLetter = await generateCoverLetter(optimizedResume, jobAnalysis);
 
@@ -199,19 +206,12 @@ router.post('/', async (req, res) => {
       // Don't fail the request — return the result even if saving failed
     }
 
-    // Get final usage count for response (Pro users skip this)
-    let usageInfo = pro
-      ? { used: null, limit: null, is_pro: true }
-      : null;
-
-    if (!usageInfo) {
-      const { data: usageRow } = await supabase
-        .from('usage_tracking')
-        .select('generation_count')
-        .eq('user_id', userId)
-        .eq('month', currentMonth())
-        .single();
-      usageInfo = { used: usageRow?.generation_count ?? 1, limit: FREE_TIER_LIMIT, is_pro: false };
+    // Build usage response
+    let usageInfo;
+    if (pro) {
+      usageInfo = { used: null, limit: null, is_pro: true };
+    } else {
+      usageInfo = { used: usageResult.used, limit: FREE_TIER_LIMIT, is_pro: false };
     }
 
     return res.json({
@@ -227,7 +227,7 @@ router.post('/', async (req, res) => {
     });
   } catch (err) {
     console.error('[generate] Pipeline failed:', err.message);
-    return res.status(500).json({ error: 'Generation failed.', detail: err.message });
+    return res.status(500).json({ error: 'Generation failed. Please try again.' });
   }
 });
 

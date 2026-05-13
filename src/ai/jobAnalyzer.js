@@ -1,6 +1,4 @@
-const Anthropic = require('@anthropic-ai/sdk');
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const { client } = require('../lib/anthropic');
 
 async function analyzeJob(rawJobText) {
   const response = await client.messages.create({
@@ -38,7 +36,11 @@ ${rawJobText}`,
   });
 
   const content = response.content[0].text.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '');
-  return JSON.parse(content);
+  try {
+    return JSON.parse(content);
+  } catch (err) {
+    throw new Error(`jobAnalyzer: Failed to parse Claude response as JSON: ${err.message}`);
+  }
 }
 
 module.exports = { analyzeJob };

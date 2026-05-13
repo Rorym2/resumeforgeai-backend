@@ -31,7 +31,7 @@ async function extractDocx(buffer) {
   return result.value;
 }
 
-// Extract text from a PDF buffer
+// Extract text from a PDF buffer using pdf-parse for reliable text extraction from PDFs
 async function extractPdf(buffer) {
   const pdfParse = require('pdf-parse/lib/pdf-parse.js');
   const data = await pdfParse(buffer);
