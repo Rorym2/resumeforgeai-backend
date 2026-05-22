@@ -12,9 +12,9 @@ const { requireAuth } = require('./src/middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Trust Railway's reverse proxy so req.ip is the real client IP,
-// not the proxy's IP. Required for express-rate-limit to work correctly.
-app.set('trust proxy', true);
+// Trust exactly one proxy hop (Railway's load balancer) so req.ip is the
+// real client IP. express-rate-limit requires a specific value, not true.
+app.set('trust proxy', 1);
 
 // Allow the mobile app (and Postman) to connect
 app.use(cors());
