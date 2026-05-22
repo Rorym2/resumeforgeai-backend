@@ -168,12 +168,12 @@ router.post('/', async (req, res) => {
       analyzeJob(job_text),
     ]);
 
-    // Steps 3-6 depend on results from 1-2
-    console.log('[generate] Step 3/6 — Scoring match...');
-    const matchScore = await scoreMatch(parsedResume, jobAnalysis);
-
-    console.log('[generate] Step 4/6 — Analyzing differentiators...');
-    const differentiators = await analyzeDifferentiators(parsedResume, jobAnalysis);
+    // Steps 3 & 4 depend on 1-2 but not on each other — run in parallel
+    console.log('[generate] Steps 3-4/6 — Scoring match and analyzing differentiators...');
+    const [matchScore, differentiators] = await Promise.all([
+      scoreMatch(parsedResume, jobAnalysis),
+      analyzeDifferentiators(parsedResume, jobAnalysis),
+    ]);
 
     console.log('[generate] Step 5/6 — Optimizing resume...');
     const optimizedResume = await optimizeResume(parsedResume, jobAnalysis);
