@@ -45,7 +45,7 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
   }
 
   const ext = path.extname(req.file.originalname).toLowerCase();
-  console.log(`[upload] File received: ${req.file.originalname}, size: ${req.file.size}, path: ${req.file.path}`);
+  console.log(`[upload] File received: ${req.file.originalname} (${ext}), size: ${req.file.size} bytes, user: ${req.user?.id}`);
 
   let buffer;
   try {
@@ -83,10 +83,11 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
       .single();
 
     if (error) {
-      console.error('Supabase insert error:', error);
+      console.error('[upload] Supabase insert error:', error.message, { user: req.user?.id });
       return res.status(500).json({ error: 'Failed to save resume.', detail: error.message });
     }
 
+    console.log(`[upload] Resume saved: id=${resume.id}, user=${req.user?.id}`);
     return res.json({
       success: true,
       resume_id: resume.id,
@@ -94,9 +95,25 @@ router.post('/resume', upload.single('resume'), async (req, res) => {
       text: resume.text_content,
     });
   } catch (err) {
-    console.error('[upload] Processing error:', err.message);
+    console.error('[upload] Processing error:', err.message, { user: req.user?.id });
     return res.status(500).json({ error: 'Failed to process file.', detail: err.message });
   }
+});
+
+// BUG FIX: Multer errors (wrong file type, file too large) are passed via next(err) and
+// will NOT be caught by the async try/catch above. This error-handling middleware
+// intercepts them at the route level before they reach the global handler, giving a
+// clean JSON response rather than an HTML error page or silent 500.
+// eslint-disable-next-line no-unused-vars
+router.use((err, req, res, next) => {
+  console.error('[upload] Middleware error:', err.message, { code: err.code });
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'File too large. Maximum upload size is 10MB.' });
+  }
+  if (err.message === 'Only PDF and DOCX files are allowed') {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err); // fall through to global handler for anything unexpected
 });
 
 module.exports = router;

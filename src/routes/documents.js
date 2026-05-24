@@ -10,6 +10,7 @@ const router = express.Router();
 // GET /documents
 // Returns all generations for the logged-in user, newest first
 router.get('/', async (req, res) => {
+  console.log(`[documents] Fetching document list for user: ${req.user.id}`);
   const { data, error } = await supabase
     .from('generations')
     .select('id, job_text, job_analysis, match_score, duration_seconds, created_at, resume_id')
@@ -17,10 +18,11 @@ router.get('/', async (req, res) => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Documents fetch error:', error);
+    console.error('[documents] Fetch error:', error.message, { user: req.user.id });
     return res.status(500).json({ error: 'Failed to fetch documents.', detail: error.message });
   }
 
+  console.log(`[documents] Returned ${data.length} documents for user: ${req.user.id}`);
   return res.json({
     success: true,
     count: data.length,

@@ -1,6 +1,8 @@
 const { client } = require('../lib/anthropic');
 
 async function scoreMatch(parsedResume, jobAnalysis) {
+  const t0 = Date.now();
+  console.log('[matchScorer] Starting');
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
@@ -45,8 +47,11 @@ ${JSON.stringify(jobAnalysis, null, 2)}`,
 
   const content = response.content[0].text.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '');
   try {
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    console.log(`[matchScorer] Done in ${Date.now() - t0}ms — score: ${parsed.overall_score}, stop_reason: ${response.stop_reason}`);
+    return parsed;
   } catch (err) {
+    console.error(`[matchScorer] JSON parse failed after ${Date.now() - t0}ms — raw response (first 200 chars):`, content.slice(0, 200));
     throw new Error(`matchScorer: Failed to parse Claude response as JSON: ${err.message}`);
   }
 }

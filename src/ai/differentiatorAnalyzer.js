@@ -1,6 +1,8 @@
 const { client } = require('../lib/anthropic');
 
 async function analyzeDifferentiators(parsedResume, jobAnalysis) {
+  const t0 = Date.now();
+  console.log('[differentiatorAnalyzer] Starting');
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
@@ -45,8 +47,11 @@ ${JSON.stringify(jobAnalysis, null, 2)}`,
 
   const content = response.content[0].text.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '');
   try {
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    console.log(`[differentiatorAnalyzer] Done in ${Date.now() - t0}ms — ${parsed.differentiators?.length ?? 0} differentiators, stop_reason: ${response.stop_reason}`);
+    return parsed;
   } catch (err) {
+    console.error(`[differentiatorAnalyzer] JSON parse failed after ${Date.now() - t0}ms — raw response (first 200 chars):`, content.slice(0, 200));
     throw new Error(`differentiatorAnalyzer: Failed to parse Claude response as JSON: ${err.message}`);
   }
 }

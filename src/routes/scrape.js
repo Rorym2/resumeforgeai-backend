@@ -16,10 +16,14 @@ function isPrivateUrl(urlString) {
     const url = new URL(urlString);
     // Block non-https schemes
     if (url.protocol !== 'https:') return true;
+    // Block IPv6 loopback/private addresses (e.g. https://[::1]/...)
+    if (url.hostname === '[::1]' || url.hostname === '::1') return true;
     // Block private IPs and hostnames
     return PRIVATE_IP_RANGES.some(regex => regex.test(url.hostname));
   } catch {
-    return false;
+    // BUG FIX: was returning false (allow) — an unparseable URL should be blocked, not passed through.
+    // Defense-in-depth: if we can't parse it, treat it as unsafe.
+    return true;
   }
 }
 
@@ -59,18 +63,22 @@ router.post('/job-url', async (req, res) => {
     return res.status(400).json({ error: 'Invalid URL. Only public HTTPS URLs are supported.' });
   }
 
+  console.log(`[scrape] Scraping URL: ${url} (user: ${req.user?.id})`);
   try {
     const result = await scrapeJobUrl(url);
+    console.log(`[scrape] Success — source: ${result.source}, text length: ${result.text?.length} chars`);
     return res.json({ success: true, ...result });
   } catch (err) {
     // LinkedIn needs the in-app browser (WebView) — tell the client
     if (err.code === 'LINKEDIN_LOGIN_REQUIRED') {
+      console.log(`[scrape] LinkedIn login required for URL: ${url}`);
       return res.status(422).json({
         error: err.message,
         code: 'LINKEDIN_LOGIN_REQUIRED',
       });
     }
 
+    console.warn(`[scrape] Failed for URL: ${url} — ${err.message}`);
     return res.status(422).json({
       error: err.message || 'Could not extract job description from this URL.',
       fallback: true,

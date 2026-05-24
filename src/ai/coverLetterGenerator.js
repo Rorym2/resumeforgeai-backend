@@ -1,9 +1,13 @@
 const { client } = require('../lib/anthropic');
 
 async function generateCoverLetter(optimizedResume, jobAnalysis) {
+  const t0 = Date.now();
+  console.log('[coverLetterGenerator] Starting');
+  // BUG FIX: was 1024 — a 350-word body alone is ~470 tokens; with JSON envelope, subject line,
+  // and candidate_name field, 1024 was regularly cutting off long cover letters mid-sentence.
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
+    max_tokens: 2048,
     messages: [
       {
         role: 'user',
@@ -41,8 +45,11 @@ Return ONLY valid JSON with this structure:
 
   const content = response.content[0].text.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '');
   try {
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    console.log(`[coverLetterGenerator] Done in ${Date.now() - t0}ms — stop_reason: ${response.stop_reason}`);
+    return parsed;
   } catch (err) {
+    console.error(`[coverLetterGenerator] JSON parse failed after ${Date.now() - t0}ms — raw response (first 200 chars):`, content.slice(0, 200));
     throw new Error(`coverLetterGenerator: Failed to parse Claude response as JSON: ${err.message}`);
   }
 }

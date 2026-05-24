@@ -9,8 +9,9 @@ const supabase = require('../lib/supabase');
 
 const router = express.Router();
 
-const FREE_TIER_LIMIT = 3; // generations per month
+const FREE_TIER_LIMIT = 3;        // generations per month
 const MAX_INPUT_LENGTH = 100 * 1024; // 100KB
+const PIPELINE_TIMEOUT_MS = 180_000; // 3 minutes — covers 6 AI calls at ~30s each
 
 // Get the current month as a string e.g. '2026-03'
 function currentMonth() {
@@ -79,6 +80,32 @@ async function checkAndIncrementUsage(userId, limit) {
   // data is an array of rows from RETURNS TABLE — grab the first
   const row = Array.isArray(data) ? data[0] : data;
   return { allowed: row.allowed, used: row.used };
+}
+
+// BUG FIX: Decrement usage by 1 if the pipeline fails after already incrementing.
+// This compensates free-tier users who would otherwise lose a generation on a server/AI error.
+// Best-effort only (accepts a tiny race window) — never throws.
+async function decrementUsage(userId) {
+  try {
+    const { data } = await supabase
+      .from('usage_tracking')
+      .select('generation_count')
+      .eq('user_id', userId)
+      .eq('month', currentMonth())
+      .maybeSingle();
+
+    if (data && data.generation_count > 0) {
+      await supabase
+        .from('usage_tracking')
+        .update({ generation_count: data.generation_count - 1, updated_at: new Date() })
+        .eq('user_id', userId)
+        .eq('month', currentMonth());
+      console.log(`[generate] Usage decremented for user ${userId} after pipeline failure`);
+    }
+  } catch (err) {
+    // Best-effort only — don't let this fail the error response
+    console.warn('[generate] Failed to decrement usage on pipeline error:', err.message);
+  }
 }
 
 // Fallback for if the RPC isn't set up yet. This has a race window where another request
@@ -160,29 +187,20 @@ router.post('/', async (req, res) => {
 
   const startTime = Date.now();
 
+  // Helper to ms-stamp each step for debugging slow pipelines
+  function elapsed() { return `${((Date.now() - startTime) / 1000).toFixed(1)}s`; }
+
   try {
-    // Steps 1 & 2 can run in parallel — they don't depend on each other
-    console.log('[generate] Steps 1-2/6 — Parsing resume and analyzing job...');
-    const [parsedResume, jobAnalysis] = await Promise.all([
-      parseResume(resume_text),
-      analyzeJob(job_text),
+    // Wrap the entire pipeline in a timeout so a hung Claude call never stalls the server
+    const pipelineResult = await Promise.race([
+      runPipeline(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('PIPELINE_TIMEOUT')), PIPELINE_TIMEOUT_MS)
+      ),
     ]);
 
-    // Steps 3 & 4 depend on 1-2 but not on each other — run in parallel
-    console.log('[generate] Steps 3-4/6 — Scoring match and analyzing differentiators...');
-    const [matchScore, differentiators] = await Promise.all([
-      scoreMatch(parsedResume, jobAnalysis),
-      analyzeDifferentiators(parsedResume, jobAnalysis),
-    ]);
-
-    console.log('[generate] Step 5/6 — Optimizing resume...');
-    const optimizedResume = await optimizeResume(parsedResume, jobAnalysis);
-
-    console.log('[generate] Step 6/6 — Generating cover letter...');
-    const coverLetter = await generateCoverLetter(optimizedResume, jobAnalysis);
-
-    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-    console.log(`[generate] Pipeline complete in ${duration}s`);
+    const { jobAnalysis, matchScore, differentiators, optimizedResume, coverLetter } = pipelineResult;
+    const duration = elapsed();
 
     // Save the full result to Supabase
     const { data: generation, error: saveError } = await supabase
@@ -202,17 +220,14 @@ router.post('/', async (req, res) => {
       .single();
 
     if (saveError) {
-      console.error('[generate] Failed to save result:', saveError.message);
+      console.error('[generate] Failed to save result:', saveError.message, { user: userId });
       // Don't fail the request — return the result even if saving failed
     }
 
     // Build usage response
-    let usageInfo;
-    if (pro) {
-      usageInfo = { used: null, limit: null, is_pro: true };
-    } else {
-      usageInfo = { used: usageResult.used, limit: FREE_TIER_LIMIT, is_pro: false };
-    }
+    const usageInfo = pro
+      ? { used: null, limit: null, is_pro: true }
+      : { used: usageResult.used, limit: FREE_TIER_LIMIT, is_pro: false };
 
     return res.json({
       success: true,
@@ -226,8 +241,48 @@ router.post('/', async (req, res) => {
       cover_letter: coverLetter,
     });
   } catch (err) {
-    console.error('[generate] Pipeline failed:', err.message);
-    return res.status(500).json({ error: 'Generation failed. Please try again.' });
+    const isTimeout = err.message === 'PIPELINE_TIMEOUT';
+    console.error(`[generate] Pipeline ${isTimeout ? 'timed out' : 'failed'} at ${elapsed()}:`, err.message, err.stack);
+
+    // BUG FIX: Decrement the usage counter so free-tier users don't lose a generation
+    // when the pipeline fails due to a server or AI error (not a user error).
+    if (!pro && usageResult?.allowed) {
+      await decrementUsage(userId);
+    }
+
+    const message = isTimeout
+      ? 'Generation timed out. Please try again.'
+      : 'Generation failed. Please try again.';
+    return res.status(500).json({ error: message });
+  }
+
+  // The actual AI pipeline, extracted so it can be wrapped in Promise.race above
+  async function runPipeline() {
+    // Steps 1 & 2 can run in parallel — they don't depend on each other
+    console.log(`[generate] Steps 1-2/6 — Parsing resume and analyzing job... (${elapsed()})`);
+    const [parsedResume, jobAnalysis] = await Promise.all([
+      parseResume(resume_text),
+      analyzeJob(job_text),
+    ]);
+    console.log(`[generate] Steps 1-2 complete (${elapsed()})`);
+
+    // Steps 3 & 4 depend on 1-2 but not on each other — run in parallel
+    console.log(`[generate] Steps 3-4/6 — Scoring match and analyzing differentiators... (${elapsed()})`);
+    const [matchScore, differentiators] = await Promise.all([
+      scoreMatch(parsedResume, jobAnalysis),
+      analyzeDifferentiators(parsedResume, jobAnalysis),
+    ]);
+    console.log(`[generate] Steps 3-4 complete (${elapsed()})`);
+
+    console.log(`[generate] Step 5/6 — Optimizing resume... (${elapsed()})`);
+    const optimizedResume = await optimizeResume(parsedResume, jobAnalysis);
+    console.log(`[generate] Step 5 complete (${elapsed()})`);
+
+    console.log(`[generate] Step 6/6 — Generating cover letter... (${elapsed()})`);
+    const coverLetter = await generateCoverLetter(optimizedResume, jobAnalysis);
+    console.log(`[generate] Pipeline complete in ${elapsed()}`);
+
+    return { jobAnalysis, matchScore, differentiators, optimizedResume, coverLetter };
   }
 });
 
